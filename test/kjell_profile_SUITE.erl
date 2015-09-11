@@ -105,7 +105,7 @@ groups() ->
 %% Reason = term()
 %% @end
 %%--------------------------------------------------------------------
-all() -> 
+all() ->
     [load_profile, set_value, get_value, get_undef_value].
 
 set_value() ->
@@ -127,13 +127,13 @@ get_undef_value(Config) ->
     {ok, Pid} = kjell_profile:start_link(),
     undefined = kjell_profile:get_value(undef).
 
-load_profile() -> 
+load_profile() ->
     [].
-load_profile(Config) -> 
+load_profile(Config) ->
     {ok, Pid} = kjell_profile:start_link(),
     DataDir = proplists:get_value(data_dir,Config),
     ok = kjell_profile:load_profile(filename:join(DataDir,"kjell.config")),
-    TxtAttrs = kjell_profile:get_value(text_attr),
+    TxtAttrs = kjell_profile:get_value('text-attr'),
     ExpectedAttrs = [{string,"\e[1;33m~ts\e[0m"},
 		     {digits,"\e[1;32m~ts\e[0m"},
 		     {keyword,"\e[1;35m~ts\e[0m"},

@@ -18,15 +18,15 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	terminate/2, code_change/3]).
 
--define(SERVER, ?MODULE). 
+-define(SERVER, ?MODULE).
 -define(LOG, kjell_log).
 
--record(state, {text_attr = [], %% TODO: remove?
+-record(state, {'text-attr' = [], %% TODO: remove?
 		settings = []}).
 
 %% flags
 
--define(FLAG_NO_COLOR, no_color). 
+-define(FLAG_NO_COLOR, no_color).
 
 %%%===================================================================
 %%% API
@@ -135,9 +135,9 @@ handle_call({load_profile, File}, _From, State) when is_list(File) ->
 							format_strs(default_colors(ansi)) % error,  use default color profile
 					end
 			end,
-			
-			{reply, ok, State#state{settings=[{text_attr,TxtFmtStrs}|Terms] ++ OldSettings}};
-		
+
+			{reply, ok, State#state{settings=[{'text-attr',TxtFmtStrs}|Terms] ++ OldSettings}};
+
 		{error,Reason} ->
 			?LOG:error("Error loading profile ~p: ~p ~n",[File,Reason]),
 			default_profile(State)
@@ -148,8 +148,8 @@ handle_call({load_profile, default}, _From, State) ->
 
 handle_call({q_str,Class,Str}, _From, State) ->
 	DisableFlag = proplists:get_value(?FLAG_NO_COLOR,State#state.settings),
-	TxtAttr = proplists:get_value(text_attr,State#state.settings),
-	Res = case DisableFlag of 
+	TxtAttr = proplists:get_value('text-attr',State#state.settings),
+	Res = case DisableFlag of
 		true ->
 			Str;
 		_ ->
@@ -237,15 +237,15 @@ code_change(_OldVsn, State, _Extra) ->
 format_strs(TextAttrs) ->
 	F = fun(AttrTuple) ->
 			{Class,{TxtAttr,FgColor,BgColor}} = AttrTuple,
-			
+
 			% filter the 'none':s
 			Attrs = lists:filter(fun(A) -> {_,V} = A, V =/= none end,
-					[{text_attr,TxtAttr},
-						{fg_color, FgColor},
-						{bg_color, BgColor}]),
-			
-			FmtStr = etcol:t([ { Attrs, "~ts"},
-						{ [{text_attr,reset}], ""}
+					[{'text-attr',TxtAttr},
+						{'fg-color', FgColor},
+						{'bg-color', BgColor}]),
+
+			FmtStr = ltcol:t([ { Attrs, "~ts"},
+						{ [{'text-attr',reset}], ""}
 						]),
 			{Class, FmtStr}
 	end,
